@@ -1,0 +1,124 @@
+//GPU learning method//
+
+## version
+python 3.8.13
+pytorch 1.9.1
+tensorflow 2.9.1
+CUDA 11.7
+cudatoolkit 10.2.89 // 버전 맞춰서 설치중-...
+cuDNN // 설치 필요
+
+## example
+
+
+
+
+------------------------------------------------------------------
+////////모델 생성 example
+------------------------------------------------------------------
+1 Sequential()
+
+model.sequential()
+model.add(input(shape =( , )))
+model. add(Dense(300, activation ='relu'))
+model. add(Dense(100, activation ='relu'))
+model. add(Dense(10, activation ='softmax'))
+
+model.summary()       #모델구조를 관찰 (파라미터 관찰도 된다)
+plot_model(model)     #모델 구조를 그림으로 관찰
+
+
+
+#1-2 Sequential()
+
+model = sequential([input(shape=( , ), name ='input'),
+                    Dense(300, activation='relu', name = 'Dense1'),
+                    Dense(100, activation='relu', name = 'Dense1'),
+                    Dense(10, activation='softmax', name = 'Output')])
+model.summary()
+plot_model(model)
+
+------------------------------------------------------------------
+
+2 함수형API
+
+
+inputs = Input(shape = (28, 28,1))
+x = Flatten(input_shape = (28,28,1))(inputs)
+x = Dense(300, activation='relu')(x)
+x = Dense(100, activation='relu')(x)
+x = Dense(10, activation='softmax')(x)
+
+model = Model(inputs = inputs, outputs = x)
+model.summary()
+
+
+
+#(다중 인풋, 평행 구조)
+
+input_1 = Input(shape=(10,10), name='input_1')
+input_2 = Input(shape=(10,28), name='input_2')
+
+hidden1 = Dense(100,activation='relu')(input_2)
+hidden2 = Dense(10,activation='relu')(hidden1)
+concat = Concatenate()([input_1, hidden2])
+output = Dense(1, activation = 'sigmoid', name='output')(concat)
+
+model = Model(input=[input_1, input_2], output=[output])
+model.summary()
+
+
+#(출력이 2개 이상)
+
+input_ = Input(shape=(10,10), name='input_')
+hidden1 = Dense(100, activation ='relu')(input_)
+hidden2 = Dense(10, activation ='relu')(hidden1)
+
+output = Dense(1, activation='sigmoid', name='main_output')(hidden2)
+sub_output = Dense(1, name='sum_outputs')(hidden2)
+
+
+
+----------------------------------------------------------------------
+3 서브클래싱(Subclassing) #잘 사용안함
+
+class Mymodel(Model):
+    def __init__(self, units=30, activation='relu', **kwargs)
+        super(MyModel, self).__init__(**kwargs)
+        self.dense_layer1 =Dense(300, activation = activation)
+        self.dense_layer2 =Dense(100, activation = activation)
+        self.dense_layer3 =Dense(units, activation = activation)
+        self.output_layer =Dense(10,activation='softmax')
+
+    def call(self, inputs)
+        x=self.dense_layer1(inputs)
+        x=self.dense_layer2(x)
+        x=self.dense_layer3(x)
+        x=self.output_layer(x)
+        return x
+
+
+inputs = Input(shape=(28, 28 , 1))
+x - Flatten(input_shape(28, 28, 1))(inputs)
+x=Dense(300, activation = 'relu')
+x=Dense(100, activation = 'relu')
+x=Dense(10, activation = 'softmax')
+model=Model(inputs=inputs, outputs=x)
+model.summary()
+
+hidden_2=model.layer[2]
+hidden_2.name
+model.get_layer('dense_24') is hidden_2   #True result
+weight, biases = hidden_2.get_weight()
+print(weight.shape)  #784,300
+print(biases.shape)  # 300
+
+
+
+
+----------------------------------------------------------------------
+4. 모델 컴파일 (loss function, optimizer, 최적화 기준)
+
+model.compile(loss='sparse_categorical_crossentropy',
+            optimizer = 'sgd',
+            metrics=['acquracy'])
